@@ -124,4 +124,5 @@ void MainWindow::on_films_tableview_clicked(const QModelIndex &index)
     if(index.isValid())
         row_to_delete = index.row();
 //    qDebug() << "Row to delete" << row_to_delete;
+    // just for fun
 }
