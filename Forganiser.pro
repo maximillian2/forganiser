@@ -12,10 +12,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    addfilm.cpp
+    addfilm.cpp \
+    manual.cpp
 
 HEADERS  += mainwindow.h \
-    addfilm.h
+    addfilm.h \
+    manual.h
 
 FORMS    += mainwindow.ui \
-    addfilm.ui
+    addfilm.ui \
+    manual.ui

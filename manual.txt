@@ -1,0 +1,14 @@
+HELLO
+================
+
+This is sample manual for Forganiser.
+
+Have a nice day!
+
+Don't hesitate sending me an email with bugs:
+maxi.ua.1996@gmail.com
+
+## TODO: change mail to smth connected with forganiser
+=================
+
+(c) 2013-2014 maxi

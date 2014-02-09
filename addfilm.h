@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSqlQuery>
 #include <QSqlRelationalTableModel>
+#include <QMessageBox>
 #include "mainwindow.h"
 
 namespace Ui {
@@ -24,7 +25,8 @@ private slots:
 
 private:
     Ui::AddFilm *ui;
-    QSqlRelationalTableModel* pointer;
+    QSqlRelationalTableModel *pointer;
+    QMessageBox empty_title_message;
 };
 
 #endif // ADDFILM_H
