@@ -23,6 +23,10 @@ public:
 private slots:
     void on_buttonBox_accepted();
 
+    void on_ok_button_clicked();
+
+    void on_cancel_button_clicked();
+
 private:
     Ui::AddFilm *ui;
     QSqlRelationalTableModel *pointer;

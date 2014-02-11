@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // set up add window
 //    dialog = new AddFilm(model);
 
-
     // setting up locale to show russian letters
     QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
@@ -37,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // set up main table
     model = new QSqlRelationalTableModel;
     model->setTable("Film_info");
+
+    // set relation between rating table and main table
     model->setRelation(2, QSqlRelation("Rating", "id", "name"));
 
     model->select();
@@ -114,7 +115,6 @@ void MainWindow::on_films_tableview_customContextMenuRequested(const QPoint &pos
         menu->addAction("Remove", this, SLOT(deleteEntry()));
 
     menu->popup(ui->films_tableview->viewport()->mapToGlobal(pos));
-
 }
 
 // delete film slot
