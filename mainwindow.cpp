@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // set up main table
     model = new QSqlRelationalTableModel;
     model->setTable("Film_info");
-//    model->setRelation(2, QSqlRelation("Rating", ""));
+    model->setRelation(2, QSqlRelation("Rating", "id", "name"));
 
     model->select();
 
