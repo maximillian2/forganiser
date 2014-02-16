@@ -45,8 +45,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->films_tableview->setModel(model);
     ui->films_tableview->show();
 
+    // turn off editing rows and ability to select one field at time
     ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//    ui->films_tableview->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->films_tableview->setSelectionMode(QAbstractItemView::SingleSelection);
 
     // hide id from table
@@ -65,16 +65,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // set up manual
     manual_page = new manual;
 
-    // total films query
-    film_num_query = new QSqlQuery("SELECT COUNT(*) FROM Film_info");
-
-    // get result as int
-    film_num_query->next();
-    film_number = film_num_query->value(0).toInt();
-
-    // set statusbar message as label widget
-    film_number_label = new QLabel("Total films watched: " + QString::number(film_number));
-    ui->statusBar->addWidget(film_number_label);
+    // statusbar consist label with number of watched films
+    setStatusMessage();
 
     createMenus();
     createActions();
@@ -206,4 +198,18 @@ void MainWindow::createActions()
 void MainWindow::manualEntry()
 {
     manual_page->show();
+}
+
+void MainWindow::setStatusMessage()
+{
+    // total films query
+    film_num_query = new QSqlQuery("SELECT COUNT(*) FROM Film_info");
+
+    // get result as int
+    film_num_query->next();
+    film_number = film_num_query->value(0).toInt();
+
+    // set statusbar message as label widget
+    film_number_label = new QLabel("Total films watched: " + QString::number(film_number));
+    ui->statusBar->addWidget(film_number_label);
 }

@@ -25,6 +25,7 @@ class MainWindow : public QMainWindow
 public:
     void createMenus();
     void createActions();
+    void setStatusMessage();
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
