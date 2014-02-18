@@ -10,21 +10,25 @@
 #include <QAction>
 #include <QSqlQuery>
 
-#include "addfilm.h"
 #include "manual.h"
+#include "addfilm.h"
 
 
 namespace Ui {
 class MainWindow;
 }
 
+class AddFilm;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
 public:
+    AddFilm *dialog;
+
     void createMenus();
     void createActions();
+
     void setStatusMessage();
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();

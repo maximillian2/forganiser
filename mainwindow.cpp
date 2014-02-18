@@ -1,3 +1,4 @@
+//#include "addfilm.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -7,13 +8,9 @@
 #include <QTextCodec>
 #include <QLabel>
 
-//#include "addfilm.h"
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    // set up add window
-//    dialog = new AddFilm(model);
 
     // setting up locale to show russian letters
     QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
@@ -25,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     db.setDatabaseName("Films");
     db.setUserName("root");
     db.setPassword("123");
+
+    film_num_query = new QSqlQuery();
 
     // open check
     if (!db.open())
@@ -64,6 +63,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // set up manual
     manual_page = new manual;
+
+    // set up add window
+    dialog = new AddFilm(model);
 
     // statusbar consist label with number of watched films
     setStatusMessage();
@@ -115,27 +117,24 @@ void MainWindow::deleteEntry()
     ui->films_tableview->model()->removeRow(row_to_delete);
     model->submitAll();
     model->select();
+    setStatusMessage();
 }
 
 // add film slot
 void MainWindow::addEntry()
 {
-    AddFilm *dialog = new AddFilm(model);
     dialog->show();
+//    setStatusMessage();
 }
 
 // helps to find out what row to delete
 void MainWindow::on_films_tableview_clicked(const QModelIndex &index)
 {
-    if(index.isValid())
-        row_to_delete = index.row();
+    if(index.isValid()) row_to_delete = index.row();
 }
 
 // exit from application slot
-void MainWindow::safeExit()
-{
-    QCoreApplication::exit();
-}
+void MainWindow::safeExit(){ QCoreApplication::exit(); }
 
 // about qt version window
 void MainWindow::aboutQtEntry()
@@ -194,16 +193,14 @@ void MainWindow::createActions()
     helpMenu->addAction(about_qt_option);
 }
 
-
-void MainWindow::manualEntry()
-{
-    manual_page->show();
-}
+// manual window
+void MainWindow::manualEntry(){ manual_page->show(); }
 
 void MainWindow::setStatusMessage()
 {
+    ui->statusBar->removeWidget(film_number_label);
     // total films query
-    film_num_query = new QSqlQuery("SELECT COUNT(*) FROM Film_info");
+    film_num_query->exec("SELECT COUNT(*) FROM Film_info");
 
     // get result as int
     film_num_query->next();

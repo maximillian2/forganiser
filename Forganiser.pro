@@ -22,3 +22,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     addfilm.ui \
     manual.ui
+
+RESOURCES += \
+    manual.qrc
