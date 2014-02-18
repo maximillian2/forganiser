@@ -40,6 +40,7 @@ public slots:
     void aboutQtEntry();
     void aboutEntry();
     void manualEntry();
+    void updateInfo();
 
 private slots:
     void on_films_tableview_customContextMenuRequested(const QPoint &pos);

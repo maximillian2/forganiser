@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // statusbar consist label with number of watched films
     setStatusMessage();
 
+    connect(dialog, SIGNAL(accepted()), this, SLOT(updateInfo()));
+
     createMenus();
     createActions();
 }
@@ -94,6 +96,8 @@ MainWindow::~MainWindow()
     delete film_num_query;
     delete film_number_label;
 
+    delete dialog;
+
     // database
     db.close();
 }
@@ -117,14 +121,15 @@ void MainWindow::deleteEntry()
     ui->films_tableview->model()->removeRow(row_to_delete);
     model->submitAll();
     model->select();
-    setStatusMessage();
+    emit updateInfo();
 }
 
 // add film slot
 void MainWindow::addEntry()
 {
     dialog->show();
-//    setStatusMessage();
+    setStatusMessage();
+    ui->films_tableview->resizeColumnsToContents();
 }
 
 // helps to find out what row to delete
@@ -209,4 +214,11 @@ void MainWindow::setStatusMessage()
     // set statusbar message as label widget
     film_number_label = new QLabel("Total films watched: " + QString::number(film_number));
     ui->statusBar->addWidget(film_number_label);
+}
+
+
+void MainWindow::updateInfo()
+{
+    setStatusMessage();
+    ui->films_tableview->resizeColumnsToContents();
 }

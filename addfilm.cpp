@@ -30,7 +30,7 @@ void AddFilm::on_ok_button_clicked()
 {
     ui->home_radioButton->isChecked() ? place = "Home" : place = "Cinema";
 
-    if(ui->title_lineedit->text() == NULL)      // successful adding
+    if(ui->title_lineedit->text() != NULL)      // successful adding
     {
         add_field = "INSERT INTO Film_info (place, rating, title) VALUES ('" + place + "', " + ui->rating_spinBox->cleanText() + ", '" + ui->title_lineedit->text() + "');";
         qDebug() << add_field;
@@ -40,7 +40,7 @@ void AddFilm::on_ok_button_clicked()
         pointer->select();
         pointer->submitAll();
 
-        this->hide();
+        this->accept();
         //TODO: make total film number count a film when adding one
         ui->title_lineedit->clear();
         ui->title_lineedit->setFocus();
@@ -51,6 +51,8 @@ void AddFilm::on_ok_button_clicked()
         ui->title_lineedit->setFocus();
         this->show();
     }
+
+
 }
 
 void AddFilm::on_cancel_button_clicked(){ this->hide(); }
