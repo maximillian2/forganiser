@@ -13,7 +13,6 @@
 #include "manual.h"
 #include "addfilm.h"
 
-
 namespace Ui {
 class MainWindow;
 }
@@ -36,6 +35,7 @@ public:
 public slots:
     void deleteEntry();
     void addEntry();
+    void editEntry();
     void safeExit();
     void aboutQtEntry();
     void aboutEntry();
@@ -45,6 +45,7 @@ public slots:
 private slots:
     void on_films_tableview_customContextMenuRequested(const QPoint &pos);
     void on_films_tableview_clicked(const QModelIndex &index);
+    void on_unlockButton_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;

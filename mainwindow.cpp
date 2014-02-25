@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->films_tableview->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    // set up manual
+    // set up manual object
     manual_page = new manual;
 
     // set up add window
@@ -71,9 +71,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setStatusMessage();
 
     connect(dialog, SIGNAL(accepted()), this, SLOT(updateInfo()));
+    connect(dialog, SIGNAL(rejected()), this, SLOT(updateInfo()));
 
     createMenus();
     createActions();
+
+    //TODO: move definition to .h (clean up this code)
+    QIcon *lock_close = new QIcon(":/images/lock-close.png");
+    ui->unlockButton->setIcon(*lock_close);
+
+    QIcon *plus = new QIcon(":/images/plus.png");
+    ui->addButton->setIcon(*plus);
 }
 
 MainWindow::~MainWindow()
@@ -109,8 +117,7 @@ void MainWindow::on_films_tableview_customContextMenuRequested(const QPoint &pos
 
     menu->addAction("Add", this, SLOT(addEntry()));
 
-    if(index.isValid())
-        menu->addAction("Remove", this, SLOT(deleteEntry()));
+    if(index.isValid()) menu->addAction("Remove", this, SLOT(deleteEntry()));
 
     menu->popup(ui->films_tableview->viewport()->mapToGlobal(pos));
 }
@@ -130,6 +137,12 @@ void MainWindow::addEntry()
     dialog->show();
     setStatusMessage();
     ui->films_tableview->resizeColumnsToContents();
+}
+
+// edit film slot
+void MainWindow::editEntry()
+{
+    dialog->show();
 }
 
 // helps to find out what row to delete
@@ -163,11 +176,8 @@ void MainWindow::createMenus()
 
 void MainWindow::createActions()
 {
-//    QString path = "./images/plus.png";
-//    QIcon icon(path);
-
     // add film feature
-    add_film_action = new QAction(/*icon,*/ tr("&Add film"),  this);
+    add_film_action = new QAction(tr("&Add film"),  this);
     add_film_action->setShortcut(tr("Ctrl+A"));
     connect(add_film_action, SIGNAL(activated()), this, SLOT(addEntry()));
 
@@ -204,6 +214,7 @@ void MainWindow::manualEntry(){ manual_page->show(); }
 void MainWindow::setStatusMessage()
 {
     ui->statusBar->removeWidget(film_number_label);
+
     // total films query
     film_num_query->exec("SELECT COUNT(*) FROM Film_info");
 
@@ -216,9 +227,30 @@ void MainWindow::setStatusMessage()
     ui->statusBar->addWidget(film_number_label);
 }
 
-
+// updates statusbar and table view
 void MainWindow::updateInfo()
 {
     setStatusMessage();
     ui->films_tableview->resizeColumnsToContents();
+}
+
+// edit fields in table
+void MainWindow::on_unlockButton_toggled(bool checked)
+{
+    QIcon *open = new QIcon(":/images/lock-open.png");
+    QIcon *close = new QIcon(":/images/lock-close.png");
+
+    if(checked)
+    {
+        ui->unlockButton->setIcon(*open);
+        ui->unlockButton->setText("Lock");
+        ui->films_tableview->setEditTriggers(QAbstractItemView::DoubleClicked);
+    }
+    else
+    {
+        ui->unlockButton->setIcon(*close);
+        ui->unlockButton->setText("Unlock");
+        ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->films_tableview->resizeColumnsToContents();
+    }
 }

@@ -13,7 +13,7 @@ manual::manual(QWidget *parent) : QWidget(parent), ui(new Ui::manual)
     ui->setupUi(this);
 
     // TODO: добавить текст из файла, который находится в той же директрии, где и проект
-    QString filename = "/home/maxi/Qt_Projects/Forganiser/manual.txt";
+    QString filename = ":/manual.txt";
     QFile file(filename);
 
     if(file.open(QIODevice::ReadOnly | QIODevice::Text))
