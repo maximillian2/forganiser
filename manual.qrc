@@ -4,5 +4,6 @@
         <file>images/lock-close.png</file>
         <file>images/lock-open.png</file>
         <file>images/plus.png</file>
+        <file>images/remove.png</file>
     </qresource>
 </RCC>

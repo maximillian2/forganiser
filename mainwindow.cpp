@@ -23,65 +23,48 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     db.setUserName("root");
     db.setPassword("123");
 
-    film_num_query = new QSqlQuery();
+    // allocate memory for items
+    film_num_query  =    new QSqlQuery;
+    model           =    new QSqlRelationalTableModel;
+    manual_page     =    new manual;
+    dialog          =    new AddFilm(model);
+    plus            =    new QIcon(":/images/plus.png");
+    remove          =    new QIcon(":/images/remove.png");
+    lock_open       =    new QIcon(":/images/lock-open.png");
+    lock_close      =    new QIcon(":/images/lock-close.png");
 
-    // open check
-    if (!db.open())
-    {
-        QMessageBox::critical(0, QObject::tr("Database Error"),
-        db.lastError().text());
-    }
+    checkConnection(db);
 
-    // set up main table
-    model = new QSqlRelationalTableModel;
     model->setTable("Film_info");
-
-    // set relation between rating table and main table
     model->setRelation(2, QSqlRelation("Rating", "id", "name"));
-
+    model->setHeaderData(1,Qt::Horizontal, tr("Film title"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Rating"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Place"));
     model->select();
 
     ui->films_tableview->setModel(model);
     ui->films_tableview->show();
-
-    // turn off editing rows and ability to select one field at time
-    ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->films_tableview->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    // hide id from table
-    ui->films_tableview->hideColumn(0);
-
-    // set custom names to columns
-    model->setHeaderData(1,Qt::Horizontal, tr("Film title"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Rating"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Place"));
-
-    //fit into column field
+    ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);        // editing rows off
+    ui->films_tableview->setSelectionMode(QAbstractItemView::ContiguousSelection);
+    ui->films_tableview->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->films_tableview->hideColumn( /*id*/ 0);
     ui->films_tableview->resizeColumnsToContents();
-
     ui->films_tableview->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    // set up manual object
-    manual_page = new manual;
-
-    // set up add window
-    dialog = new AddFilm(model);
-
-    // statusbar consist label with number of watched films
+    // statusbar consist label with No. of watched films
     setStatusMessage();
 
     connect(dialog, SIGNAL(accepted()), this, SLOT(updateInfo()));
-    connect(dialog, SIGNAL(rejected()), this, SLOT(updateInfo()));
 
     createMenus();
     createActions();
 
-    //TODO: move definition to .h (clean up this code)
-    QIcon *lock_close = new QIcon(":/images/lock-close.png");
     ui->unlockButton->setIcon(*lock_close);
-
-    QIcon *plus = new QIcon(":/images/plus.png");
     ui->addButton->setIcon(*plus);
+    ui->removeButton->setIcon(*remove);
+
+    // nothing to remove
+    ui->removeButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -105,25 +88,65 @@ MainWindow::~MainWindow()
     delete film_number_label;
 
     delete dialog;
-
     // database
     db.close();
 }
 
+// first - private slots
+// second - public slots
+// third - functions
+
+// context menu
 void MainWindow::on_films_tableview_customContextMenuRequested(const QPoint &pos)
 {
     menu = new QMenu(this);
     index = ui->films_tableview->indexAt(pos);
 
-    menu->addAction("Add", this, SLOT(addEntry()));
+    menu->addAction("Add", this, SLOT(addFilmEntry()));
 
-    if(index.isValid()) menu->addAction("Remove", this, SLOT(deleteEntry()));
-
+    if(index.isValid())
+    {
+        menu->addAction("Remove", this, SLOT(deleteFilmEntry()));
+    }
     menu->popup(ui->films_tableview->viewport()->mapToGlobal(pos));
 }
 
-// delete film slot
-void MainWindow::deleteEntry()
+// row to delete
+void MainWindow::on_films_tableview_clicked(const QModelIndex &index)
+{
+    if(index.isValid())
+    {
+        row_to_delete = index.row();
+        ui->removeButton->setEnabled(true);
+    }
+    else
+        ui->removeButton->setEnabled(false);
+}
+
+// edit field
+void MainWindow::on_unlockButton_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->unlockButton->setIcon(*lock_open);
+        ui->unlockButton->setText("Lock");
+        ui->films_tableview->setEditTriggers(QAbstractItemView::DoubleClicked);
+    }
+    else
+    {
+        ui->unlockButton->setIcon(*lock_close);
+        ui->unlockButton->setText("Unlock");
+        ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->films_tableview->resizeColumnsToContents();
+    }
+}
+
+void MainWindow::on_addButton_clicked()
+{
+    emit addFilmEntry();
+}
+
+void MainWindow::deleteFilmEntry()
 {
     ui->films_tableview->model()->removeRow(row_to_delete);
     model->submitAll();
@@ -131,41 +154,47 @@ void MainWindow::deleteEntry()
     emit updateInfo();
 }
 
-// add film slot
-void MainWindow::addEntry()
+void MainWindow::addFilmEntry()
 {
     dialog->show();
+    emit updateInfo();
+}
+
+void MainWindow::applicationExit()
+{
+    QCoreApplication::exit();
+}
+
+void MainWindow::aboutQtEntry()
+{
+    QMessageBox::aboutQt(0, QString("About"));
+}
+
+void MainWindow::aboutProgramEntry()
+{
+    QMessageBox::about(0, QString("About Forganiser"), QString("Program to store watched film info."));
+}
+
+void MainWindow::manualPageEntry()
+{
+    manual_page->show();
+}
+
+// table view/statusbar update
+void MainWindow::updateInfo()
+{
     setStatusMessage();
     ui->films_tableview->resizeColumnsToContents();
 }
 
-// edit film slot
-void MainWindow::editEntry()
+void MainWindow::checkConnection(QSqlDatabase db)
 {
-    dialog->show();
-}
+    if (!db.open())
+    {
+        QMessageBox::critical(0, QObject::tr("Database Error"),
+        db.lastError().text());
+    }
 
-// helps to find out what row to delete
-void MainWindow::on_films_tableview_clicked(const QModelIndex &index)
-{
-    if(index.isValid()) row_to_delete = index.row();
-}
-
-// exit from application slot
-void MainWindow::safeExit(){ QCoreApplication::exit(); }
-
-// about qt version window
-void MainWindow::aboutQtEntry()
-{
-    QString string = "About";
-    QMessageBox::aboutQt(0, string);
-}
-
-// about program window
-void MainWindow::aboutEntry()
-{
-    QString title = "About Forganiser", text = "Program to store watched film info.";
-    QMessageBox::about(0, title, text);
 }
 
 void MainWindow::createMenus()
@@ -176,40 +205,31 @@ void MainWindow::createMenus()
 
 void MainWindow::createActions()
 {
-    // add film feature
     add_film_action = new QAction(tr("&Add film"),  this);
     add_film_action->setShortcut(tr("Ctrl+A"));
-    connect(add_film_action, SIGNAL(activated()), this, SLOT(addEntry()));
+    connect(add_film_action, SIGNAL(activated()), this, SLOT(addFilmEntry()));
 
-    // safe exit feature
     exit = new QAction(tr("&Exit"), this);
     exit->setShortcut(tr("Ctrl+Q"));
-    connect(exit, SIGNAL(activated()), this, SLOT(safeExit()));
+    connect(exit, SIGNAL(activated()), this, SLOT(applicationExit()));
 
-    // manual feature
     manual_option = new QAction(tr("&Manual"), this);
     manual_option->setShortcut(tr("F1"));
-    connect(manual_option, SIGNAL(activated()), this, SLOT(manualEntry()));
+    connect(manual_option, SIGNAL(activated()), this, SLOT(manualPageEntry()));
 
-    // about program feature
     about_option = new QAction(tr("&About Forganiser"), this);
-    connect(about_option, SIGNAL(activated()), this, SLOT(aboutEntry()));
+    connect(about_option, SIGNAL(activated()), this, SLOT(aboutProgramEntry()));
 
-    // about qt feature
     about_qt_option = new QAction(tr("&About Qt"), this);
     connect(about_qt_option, SIGNAL(activated()), this, SLOT(aboutQtEntry()));
 
     // adding actions to menu
     fileMenu->addAction(add_film_action);
     fileMenu->addAction(exit);
-
     helpMenu->addAction(manual_option);
     helpMenu->addAction(about_option);
     helpMenu->addAction(about_qt_option);
 }
-
-// manual window
-void MainWindow::manualEntry(){ manual_page->show(); }
 
 void MainWindow::setStatusMessage()
 {
@@ -225,32 +245,4 @@ void MainWindow::setStatusMessage()
     // set statusbar message as label widget
     film_number_label = new QLabel("Total films watched: " + QString::number(film_number));
     ui->statusBar->addWidget(film_number_label);
-}
-
-// updates statusbar and table view
-void MainWindow::updateInfo()
-{
-    setStatusMessage();
-    ui->films_tableview->resizeColumnsToContents();
-}
-
-// edit fields in table
-void MainWindow::on_unlockButton_toggled(bool checked)
-{
-    QIcon *open = new QIcon(":/images/lock-open.png");
-    QIcon *close = new QIcon(":/images/lock-close.png");
-
-    if(checked)
-    {
-        ui->unlockButton->setIcon(*open);
-        ui->unlockButton->setText("Lock");
-        ui->films_tableview->setEditTriggers(QAbstractItemView::DoubleClicked);
-    }
-    else
-    {
-        ui->unlockButton->setIcon(*close);
-        ui->unlockButton->setText("Unlock");
-        ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->films_tableview->resizeColumnsToContents();
-    }
 }
