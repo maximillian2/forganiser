@@ -48,6 +48,8 @@ private slots:
     void on_unlockButton_toggled(bool checked);
     void on_addButton_clicked();
 
+    void on_removeButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QSqlRelationalTableModel *model;

@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // nothing to remove
     ui->removeButton->setEnabled(false);
+
+    ui->films_tableview->selectionModel()->clearSelection();
 }
 
 MainWindow::~MainWindow()
@@ -114,13 +116,19 @@ void MainWindow::on_films_tableview_customContextMenuRequested(const QPoint &pos
 // row to delete
 void MainWindow::on_films_tableview_clicked(const QModelIndex &index)
 {
+
+    qDebug() << index.row();
     if(index.isValid())
     {
+        qDebug() << "index is valid";
         row_to_delete = index.row();
         ui->removeButton->setEnabled(true);
     }
     else
+    {
         ui->removeButton->setEnabled(false);
+        qDebug() << "row is invalid";
+    }
 }
 
 // edit field
@@ -245,4 +253,9 @@ void MainWindow::setStatusMessage()
     // set statusbar message as label widget
     film_number_label = new QLabel("Total films watched: " + QString::number(film_number));
     ui->statusBar->addWidget(film_number_label);
+}
+
+void MainWindow::on_removeButton_clicked()
+{
+    emit deleteFilmEntry();
 }

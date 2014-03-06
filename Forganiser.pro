@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT += core gui sql
 
 TARGET = Forganiser
 TEMPLATE = app
@@ -15,11 +15,11 @@ SOURCES += main.cpp\
     addfilm.cpp \
     manual.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += mainwindow.h \
     addfilm.h \
     manual.h
 
-FORMS    += mainwindow.ui \
+FORMS += mainwindow.ui \
     addfilm.ui \
     manual.ui
 
