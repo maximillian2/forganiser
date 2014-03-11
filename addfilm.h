@@ -19,7 +19,7 @@ class AddFilm : public QDialog
 public:
     explicit AddFilm(QSqlRelationalTableModel *model);
     ~AddFilm();
-    
+
 private slots:
     void on_ok_button_clicked();
     void on_cancel_button_clicked();

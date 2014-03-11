@@ -1,4 +1,3 @@
-//#include "addfilm.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -30,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     dialog          =    new AddFilm(model);
     plus            =    new QIcon(":/images/plus.png");
     remove          =    new QIcon(":/images/remove.png");
-    lock_open       =    new QIcon(":/images/lock-open.png");
-    lock_close      =    new QIcon(":/images/lock-close.png");
+    unlock          =    new QIcon(":/images/unlock.png");
+    lock            =    new QIcon(":/images/lock.png");
 
     checkConnection(db);
 
@@ -54,19 +53,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // statusbar consist label with No. of watched films
     setStatusMessage();
 
-    connect(dialog, SIGNAL(accepted()), this, SLOT(updateInfo()));
+//    connect(dialog, SIGNAL(accepted()), this, SLOT(updateInfo()));
+    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(addFilmEntry()));
 
     createMenus();
     createActions();
 
-    ui->unlockButton->setIcon(*lock_close);
+    ui->unlockButton->setIcon(*lock);
     ui->addButton->setIcon(*plus);
-    ui->removeButton->setIcon(*remove);
 
-    // nothing to remove
-    ui->removeButton->setEnabled(false);
+//    ui->films_tableview->selectionModel()->clearSelection();
 
-    ui->films_tableview->selectionModel()->clearSelection();
 }
 
 MainWindow::~MainWindow()
@@ -104,30 +101,23 @@ void MainWindow::on_films_tableview_customContextMenuRequested(const QPoint &pos
     menu = new QMenu(this);
     index = ui->films_tableview->indexAt(pos);
 
-    menu->addAction("Add", this, SLOT(addFilmEntry()));
-
     if(index.isValid())
     {
         menu->addAction("Remove", this, SLOT(deleteFilmEntry()));
     }
+//    else
+//    {
+//        menu->addAction("Add", this, SLOT(addFilmEntry()));
+//    }
     menu->popup(ui->films_tableview->viewport()->mapToGlobal(pos));
 }
 
 // row to delete
 void MainWindow::on_films_tableview_clicked(const QModelIndex &index)
 {
-
-    qDebug() << index.row();
     if(index.isValid())
     {
-        qDebug() << "index is valid";
         row_to_delete = index.row();
-        ui->removeButton->setEnabled(true);
-    }
-    else
-    {
-        ui->removeButton->setEnabled(false);
-        qDebug() << "row is invalid";
     }
 }
 
@@ -136,36 +126,28 @@ void MainWindow::on_unlockButton_toggled(bool checked)
 {
     if(checked)
     {
-        ui->unlockButton->setIcon(*lock_open);
-        ui->unlockButton->setText("Lock");
+        ui->unlockButton->setIcon(*unlock);
         ui->films_tableview->setEditTriggers(QAbstractItemView::DoubleClicked);
     }
     else
     {
-        ui->unlockButton->setIcon(*lock_close);
-        ui->unlockButton->setText("Unlock");
+        ui->unlockButton->setIcon(*lock);
         ui->films_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
         ui->films_tableview->resizeColumnsToContents();
     }
 }
 
-void MainWindow::on_addButton_clicked()
-{
-    emit addFilmEntry();
-}
-
 void MainWindow::deleteFilmEntry()
 {
     ui->films_tableview->model()->removeRow(row_to_delete);
-    model->submitAll();
+//    model->submitAll();
     model->select();
-    emit updateInfo();
+    row_to_delete = -1;
 }
 
 void MainWindow::addFilmEntry()
 {
     dialog->show();
-    emit updateInfo();
 }
 
 void MainWindow::applicationExit()
@@ -202,7 +184,6 @@ void MainWindow::checkConnection(QSqlDatabase db)
         QMessageBox::critical(0, QObject::tr("Database Error"),
         db.lastError().text());
     }
-
 }
 
 void MainWindow::createMenus()
@@ -231,9 +212,14 @@ void MainWindow::createActions()
     about_qt_option = new QAction(tr("&About Qt"), this);
     connect(about_qt_option, SIGNAL(activated()), this, SLOT(aboutQtEntry()));
 
+    delete_option = new QAction(tr("&Delete film"), this);
+    delete_option->setShortcut(tr("Del"));
+    connect(delete_option, SIGNAL(activated()), this, SLOT(deleteFilmEntry()));
+
     // adding actions to menu
     fileMenu->addAction(add_film_action);
     fileMenu->addAction(exit);
+    fileMenu->addAction(delete_option);
     helpMenu->addAction(manual_option);
     helpMenu->addAction(about_option);
     helpMenu->addAction(about_qt_option);
@@ -253,9 +239,4 @@ void MainWindow::setStatusMessage()
     // set statusbar message as label widget
     film_number_label = new QLabel("Total films watched: " + QString::number(film_number));
     ui->statusBar->addWidget(film_number_label);
-}
-
-void MainWindow::on_removeButton_clicked()
-{
-    emit deleteFilmEntry();
 }

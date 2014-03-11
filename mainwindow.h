@@ -46,9 +46,6 @@ private slots:
     void on_films_tableview_customContextMenuRequested(const QPoint &pos);
     void on_films_tableview_clicked(const QModelIndex &index);
     void on_unlockButton_toggled(bool checked);
-    void on_addButton_clicked();
-
-    void on_removeButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -66,13 +63,14 @@ private:
     QAction *manual_option;
     QAction *about_option;
     QAction *about_qt_option;
+    QAction *delete_option;
     QAction *exit;
 
     QSqlQuery *film_num_query;
     QLabel *film_number_label;
 
-    QIcon *lock_close;
-    QIcon *lock_open;
+    QIcon *lock;
+    QIcon *unlock;
     QIcon *plus;
     QIcon *remove;
 

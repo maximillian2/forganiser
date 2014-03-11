@@ -24,4 +24,4 @@ FORMS += mainwindow.ui \
     manual.ui
 
 RESOURCES += \
-    manual.qrc
+    everything.qrc

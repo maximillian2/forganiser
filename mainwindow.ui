@@ -42,16 +42,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="removeButton">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="unlockButton">
         <property name="text">
-         <string>Unlock</string>
+         <string/>
         </property>
         <property name="checkable">
          <bool>true</bool>

@@ -7,9 +7,6 @@ AddFilm::AddFilm(QSqlRelationalTableModel *model) : ui(new Ui::AddFilm)
     ui->setupUi(this);
     pointer = model;
 
-    // FIXME: implement function setDefault(QString).
-    place = "Cinema";   // "Cinema" is default
-
     // set up modal window with warning
     empty_title_message.setModal(true);
     empty_title_message.setText("No film title specified. Please, try again.");
@@ -34,11 +31,12 @@ void AddFilm::on_ok_button_clicked()
     if(ui->title_lineedit->text() != NULL)      // successful adding
     {
         add_field = "INSERT INTO Film_info (place, rating, title) VALUES ('" + place + "', " + ui->rating_spinBox->cleanText() + ", '" + ui->title_lineedit->text() + "');";
-        //FIXME: move definition to .h
-        QSqlQuery query(add_field);
-        query.exec();
-        pointer->select();
+
+        QSqlQuery query;
+        query.exec(add_field);
         pointer->submitAll();
+        pointer->select();
+
         this->accept();
 
         ui->title_lineedit->clear();
@@ -50,8 +48,6 @@ void AddFilm::on_ok_button_clicked()
         ui->title_lineedit->setFocus();
         this->show();
     }
-
-
 }
 
 void AddFilm::on_cancel_button_clicked()
