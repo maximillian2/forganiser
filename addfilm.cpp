@@ -1,11 +1,12 @@
 #include "addfilm.h"
 #include "ui_addfilm.h"
 #include <QDebug>
+#include <QSqlError>
 
 AddFilm::AddFilm(QSqlRelationalTableModel *model) : ui(new Ui::AddFilm)
 {
     ui->setupUi(this);
-    pointer = model;
+    model_pointer = model;
 
     // set up modal window with warning
     empty_title_message.setModal(true);
@@ -20,7 +21,7 @@ AddFilm::AddFilm(QSqlRelationalTableModel *model) : ui(new Ui::AddFilm)
 AddFilm::~AddFilm()
 {
     delete ui;
-    delete pointer;
+    delete model_pointer;
 }
 
 void AddFilm::on_ok_button_clicked()
@@ -30,17 +31,20 @@ void AddFilm::on_ok_button_clicked()
 
     if(ui->title_lineedit->text() != NULL)      // successful adding
     {
-        add_field = "INSERT INTO Film_info (place, rating, title) VALUES ('" + place + "', " + ui->rating_spinBox->cleanText() + ", '" + ui->title_lineedit->text() + "');";
+        add_field = "INSERT INTO information (title, rating, place) VALUES ('" + ui->title_lineedit->text() + "', " + ui->rating_spinBox->cleanText() + ", '" + place + "');";
 
-        QSqlQuery query;
-        query.exec(add_field);
-        pointer->submitAll();
-        pointer->select();
+        QSqlQuery *query = new QSqlQuery;
+        query->exec(add_field);
+
+        model_pointer->submitAll();
+        model_pointer->select();
 
         this->accept();
 
         ui->title_lineedit->clear();
         ui->title_lineedit->setFocus();
+
+        qDebug() << "**Added entry successfully.";
     }
     else
     {

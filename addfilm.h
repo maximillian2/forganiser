@@ -28,7 +28,7 @@ private:
     QString add_field;
     QString place;
     Ui::AddFilm *ui;
-    QSqlRelationalTableModel *pointer;
+    QSqlRelationalTableModel *model_pointer;
     QMessageBox empty_title_message;
 };
 
