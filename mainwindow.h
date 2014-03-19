@@ -10,9 +10,6 @@
 #include <QAction>
 #include <QSqlQuery>
 
-#include "manual.h"
-#include "addfilm.h"
-
 namespace Ui {
 class MainWindow;
 }
@@ -26,54 +23,55 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    AddFilm *dialog;
-
     void checkConnection(QSqlDatabase);
     void createMenus();
     void createActions();
     void setStatusMessage();
 
 public slots:
-    void deleteFilmEntry();
-    void addFilmEntry();
-    void applicationExit();
+    void addEntry();
+    void deleteEntry();
+    void applicationExitEntry();
     void aboutQtEntry();
-    void aboutProgramEntry();
-    void manualPageEntry();
+    void aboutEntry();
+    void manualEntry();
     void updateInfo();
+    void showPaneEntry(bool hide);
 
 private slots:
-    void on_films_tableview_clicked(const QModelIndex &index);
     void on_unlockButton_toggled(bool checked);
+    void on_filmsTableView_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
     QSqlRelationalTableModel *model;
 
-    manual *manual_page;
     QSqlDatabase db;
     QModelIndex index;
 
     QMenu *menu;
     QMenu *fileMenu;
+    QMenu *viewMenu;
     QMenu *helpMenu;
 
-    QAction *add_film_action;
-    QAction *manual_option;
-    QAction *about_option;
-    QAction *about_qt_option;
-    QAction *delete_option;
-    QAction *exit;
+    QAction *addAction;
+    QAction *deleteAction;
+    QAction *exitAction;
 
-    QLabel *film_number_label;
+    QAction *showPaneAction;
 
-    QIcon *lock;
-    QIcon *unlock;
-    QIcon *plus;
-    QIcon *remove;
+    QAction *manualAction;
+    QAction *aboutAction;
+    QAction *aboutQtAction;
 
-    int selected_row;
-    int film_number;
+    QLabel *filmNumberLabel;
+
+    QIcon *lockIcon;
+    QIcon *unlockIcon;
+    QIcon *plusIcon;
+
+    int selectedRow;
+    int filmNumber;
 
 };
 

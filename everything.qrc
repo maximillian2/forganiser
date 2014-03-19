@@ -1,9 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>manual.txt</file>
         <file>images/plus.png</file>
-        <file>images/remove.png</file>
         <file>images/lock.png</file>
         <file>images/unlock.png</file>
+        <file>images/fr.png</file>
     </qresource>
 </RCC>

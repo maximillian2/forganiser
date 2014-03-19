@@ -34,7 +34,7 @@ void AddFilm::on_ok_button_clicked()
         add_field = "INSERT INTO information (title, rating, place) VALUES ('" + ui->title_lineedit->text() + "', " + ui->rating_spinBox->cleanText() + ", '" + place + "');";
 
         QSqlQuery *query = new QSqlQuery;
-        query->exec(add_field);
+        qDebug() << query->exec(add_field);
 
         model_pointer->submitAll();
         model_pointer->select();
@@ -50,7 +50,7 @@ void AddFilm::on_ok_button_clicked()
     {
         empty_title_message.show();
         ui->title_lineedit->setFocus();
-        this->show();
+        this->exec();
     }
 }
 
