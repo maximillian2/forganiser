@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
     // connecting to database
+    qDebug() << QSqlDatabase::isDriverAvailable("QIBASE");
     db = QSqlDatabase::addDatabase("QSQLITE");
 
     //FIXME: locate file in more true way
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         qDebug() << "Error: Database not found at" << filePath;
     }
     // allocate memory for items
-    model           =    new QSqlRelationalTableModel;
+    model               =    new QSqlRelationalTableModel;
     plusIcon            =    new QIcon(":/images/plus.png");
     unlockIcon          =    new QIcon(":/images/unlock.png");
     lockIcon            =    new QIcon(":/images/lock.png");
@@ -80,7 +81,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->watchedLabel->setVisible(false);
     ui->deleteButtonDetail->setVisible(false);
 
-    ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);}
+    ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    showPaneAction->setChecked(true);
+    showStatusBarAction->setChecked(true);
+    qDebug() << db.drivers();
+}
 
 MainWindow::~MainWindow()
 {
@@ -101,12 +107,8 @@ MainWindow::~MainWindow()
     db.close();
 }
 
-// first - private slots
-// second - public slots
-// third - functions
+// first - private slots, second - public slots, third - functions
 
-// row to delete
-// TODO: disable remove button when not on the cell
 void MainWindow::on_filmsTableView_clicked(const QModelIndex &index)
 {
     if(index.isValid())
@@ -127,13 +129,12 @@ void MainWindow::on_filmsTableView_clicked(const QModelIndex &index)
     ui->placeCheckbox->setText(query.value(1).toString());
     ui->ratingLabelDetail->setText(query.value(2).toString());
 
-    ui->placeCheckbox->setVisible(true);
-    ui->watchedLabel->setVisible(true);
-    ui->deleteButtonDetail->setVisible(true);
-
+    QWidgetList widgets = ui->scrollArea->findChildren<QWidget *>();
+    foreach(QWidget *cur, widgets)
+        cur->setVisible(true);
 }
 
-// edit field
+// editing feature
 void MainWindow::on_unlockButton_toggled(bool checked)
 {
     if(checked)
@@ -152,16 +153,16 @@ void MainWindow::deleteEntry()
 {
     ui->filmsTableView->model()->removeRow(selectedRow);
     model->select();
-
     qDebug() << "**Deleted row #" << selectedRow << "successfully." ;
 
     selectedRow = -1;
-
     updateInfo();       // should this be in connect() or like function in this slot ???
-//    ui->rating_label->setVisible(false);
-//    ui->film_title_label->setVisible(false);
-//    ui->place_Checkbox->setVisible(false);
-//    ui->removeButton->setVisible(false);
+
+    QWidgetList widgets = ui->scrollArea->findChildren<QWidget *>();
+    foreach(QWidget *cur, widgets)
+        cur->setVisible(false);
+
+    ui->filmsTableView->clearSelection();
 }
 
 void MainWindow::addEntry()
@@ -186,7 +187,7 @@ void MainWindow::aboutEntry()
 {
     QMessageBox::about(this, tr("About Forganiser"), tr("<h2>Forganiser 0.77</h2>"
                                                         "<p>Copyright &copy; 2014 maxi"
-                                                        "<p>Forganiser is a small apllication to store information about wathed films."));
+                                                        "<p>Forganiser is a small apllication to store information about watched films."));
 }
 
 void MainWindow::manualEntry()
@@ -202,12 +203,14 @@ void MainWindow::updateInfo()
     ui->filmsTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 }
 
-void MainWindow::showPaneEntry(bool hide)
+void MainWindow::showPaneEntry(bool visible)
 {
-    if(hide)
-        ui->scrollArea->setVisible(false);
-    else
-        ui->scrollArea->setVisible(true);
+    visible ? ui->scrollArea->setVisible(true) : ui->scrollArea->setVisible(false);
+}
+
+void MainWindow::showStatusBarEntry(bool visible)
+{
+    visible ? ui->statusBar->show() : ui->statusBar->hide();
 }
 
 void MainWindow::checkConnection(QSqlDatabase db)
@@ -256,6 +259,10 @@ void MainWindow::createActions()
     showPaneAction->setCheckable(true);
     connect(showPaneAction, SIGNAL(toggled(bool)), this, SLOT(showPaneEntry(bool)));
 
+    showStatusBarAction = new QAction(tr("&Show statusbar"), this);
+    showStatusBarAction->setCheckable(true);
+    connect(showStatusBarAction, SIGNAL(toggled(bool)), this, SLOT(showStatusBarEntry(bool)));
+
     // adding actions to menu
     fileMenu->addAction(addAction);
     fileMenu->addAction(deleteAction);
@@ -263,6 +270,7 @@ void MainWindow::createActions()
     fileMenu->addAction(exitAction);
 
     viewMenu->addAction(showPaneAction);
+    viewMenu->addAction(showStatusBarAction);
 
     helpMenu->addAction(manualAction);
     helpMenu->addAction(aboutAction);
