@@ -27,7 +27,6 @@ AddFilm::~AddFilm()
 
 void AddFilm::on_ok_button_clicked()
 {
-    // FIXME: make this human viewable
     ui->home_radioButton->isChecked() ? place = "Home" : place = "Cinema";
 
     if(ui->title_lineedit->text() != NULL)      // successful adding

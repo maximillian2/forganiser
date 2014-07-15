@@ -1,0 +1,20 @@
+     echo: off
+  explain: off
+  headers: off
+     mode: list
+nullvalue: ""
+   output: STDOUT
+separator: "|"
+    stats: off
+    width: 
+CREATE TABLE information (
+    "id" INTEGER NOT NULL,
+    "place" CHAR DEFAULT ('Cinema'),
+    "rating" INTEGER NOT NULL DEFAULT (1),
+    "title" CHAR DEFAULT ('noname')
+);
+1|kief|1|home
+CREATE TABLE rating (id integer primary key not null, name char(5));
+1|*
+1|*
+2|*
