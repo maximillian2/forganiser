@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
     // connecting to database
-    qDebug() << QSqlDatabase::isDriverAvailable("QIBASE");
+//    qDebug() << QSqlDatabase::isDriverAvailable("QIBASE");
     db = QSqlDatabase::addDatabase("QSQLITE");
 
     //FIXME: locate file in more true way
@@ -40,23 +40,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
     // allocate memory for items
     model               =    new QSqlRelationalTableModel;
-    plusIcon            =    new QIcon(":/images/plus.png");
     unlockIcon          =    new QIcon(":/images/unlock.png");
     lockIcon            =    new QIcon(":/images/lock.png");
 
     checkConnection(db);
     model->setTable("information");
-    model->setRelation(2, QSqlRelation("Rating", "id", "name"));
+//    model->setRelation(2, QSqlRelation("Rating", "id", "name"));
     model->setHeaderData(1,Qt::Horizontal, tr("Film title"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Rating"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Place"));
+//    model->setHeaderData(2, Qt::Horizontal, tr("Rating"));
+//    model->setHeaderData(3, Qt::Horizontal, tr("Place"));
     model->select();
 
     ui->filmsTableView->setModel(model);
     ui->filmsTableView->show();
     ui->filmsTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);        // editing rows off
-    ui->filmsTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
-    ui->filmsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+//    ui->filmsTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
+//    ui->filmsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->filmsTableView->hideColumn( /*id*/     0);
     ui->filmsTableView->hideColumn( /*rating*/ 2);
     ui->filmsTableView->hideColumn( /*place*/  3);
@@ -72,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     createActions();
 
     ui->unlockButton->setIcon(*lockIcon);
-    ui->addButton->setIcon(*plusIcon);
 
     ui->filmsTableView->setSortingEnabled(true);
     ui->filmsTableView->sortByColumn(0, Qt::AscendingOrder);
@@ -85,7 +83,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     showPaneAction->setChecked(true);
     showStatusBarAction->setChecked(true);
-    qDebug() << db.drivers();
 }
 
 MainWindow::~MainWindow()
@@ -141,9 +138,7 @@ void MainWindow::on_unlockButton_toggled(bool checked)
     {
         ui->unlockButton->setIcon(*unlockIcon);
         ui->filmsTableView->setEditTriggers(QAbstractItemView::DoubleClicked);
-    }
-    else
-    {
+    } else {
         ui->unlockButton->setIcon(*lockIcon);
         ui->filmsTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     }
@@ -218,8 +213,7 @@ void MainWindow::checkConnection(QSqlDatabase db)
     bool connected = db.open();
     if (!connected)
     {
-        QMessageBox::critical(0, QObject::tr("Can't open database."),
-        db.lastError().text());
+        QMessageBox::critical(0, QObject::tr("Can't open database."), db.lastError().text());
         qDebug() << "Error: Can't open database.\n" << db.lastError().text();
     }
 }
@@ -290,5 +284,5 @@ void MainWindow::setStatusMessage()
     filmNumberLabel = new QLabel("Total films: " + QString::number(filmNumber));
     ui->statusBar->addWidget(filmNumberLabel);
 
-    delete filmNumberQuery;
+//    delete filmNumberQuery;
 }

@@ -36,7 +36,8 @@ public slots:
     void aboutEntry();
     void manualEntry();
     void updateInfo();
-    void showPaneEntry(bool hide);
+    void showPaneEntry(bool visible);
+    void showStatusBarEntry(bool visible);
 
 private slots:
     void on_unlockButton_toggled(bool checked);
@@ -59,6 +60,7 @@ private:
     QAction *exitAction;
 
     QAction *showPaneAction;
+    QAction *showStatusBarAction;
 
     QAction *manualAction;
     QAction *aboutAction;
@@ -68,7 +70,6 @@ private:
 
     QIcon *lockIcon;
     QIcon *unlockIcon;
-    QIcon *plusIcon;
 
     int selectedRow;
     int filmNumber;

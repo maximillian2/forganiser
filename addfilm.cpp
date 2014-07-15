@@ -1,5 +1,6 @@
 #include "addfilm.h"
 #include "ui_addfilm.h"
+
 #include <QDebug>
 #include <QSqlError>
 
@@ -34,7 +35,7 @@ void AddFilm::on_ok_button_clicked()
         add_field = "INSERT INTO information (title, rating, place) VALUES ('" + ui->title_lineedit->text() + "', " + ui->rating_spinBox->cleanText() + ", '" + place + "');";
 
         QSqlQuery *query = new QSqlQuery;
-        qDebug() << query->exec(add_field);
+        query->exec(add_field);
 
         model_pointer->submitAll();
         model_pointer->select();

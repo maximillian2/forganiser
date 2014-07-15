@@ -122,6 +122,10 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="everything.qrc">
+          <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+        </property>
        </widget>
       </item>
       <item>
@@ -177,6 +181,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="everything.qrc"/>
+ </resources>
  <connections/>
 </ui>
